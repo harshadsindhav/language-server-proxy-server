@@ -16,7 +16,7 @@ if (argv.help || !argv.languageServers) {
   process.exit(1);
 }
 
-let serverPort : number = parseInt(argv.port) || 3000;
+let serverPort: number = parseInt(argv.port) || 3000;
 
 let languageServers;
 try {
@@ -31,7 +31,7 @@ try {
   process.exit(1);
 }
 
-const wss : ws.Server = new ws.Server({
+const wss: ws.Server = new ws.Server({
   port: serverPort,
   perMessageDeflate: false
 }, () => {
@@ -40,20 +40,20 @@ const wss : ws.Server = new ws.Server({
 
 function toSocket(webSocket: ws): rpc.IWebSocket {
   return {
-      send: content => webSocket.send(content),
-      onMessage: cb => webSocket.onmessage = event => cb(event.data),
-      onError: cb => webSocket.onerror = event => {
-          if ('message' in event) {
-              cb((event as any).message)
-          }
-      },
-      onClose: cb => webSocket.onclose = event => cb(event.code, event.reason),
-      dispose: () => webSocket.close()
+    send: content => webSocket.send(content),
+    onMessage: cb => webSocket.onmessage = event => cb(event.data),
+    onError: cb => webSocket.onerror = event => {
+      if ('message' in event) {
+        cb((event as any).message)
+      }
+    },
+    onClose: cb => webSocket.onclose = event => cb(event.code, event.reason),
+    dispose: () => webSocket.close()
   }
 }
 
-wss.on('connection', (client : ws, request : http.IncomingMessage) => {
-  let langServer : string[];
+wss.on('connection', (client: ws, request: http.IncomingMessage) => {
+  let langServer: string[];
 
   Object.keys(languageServers).forEach((key) => {
     if (request.url === '/' + key) {
@@ -66,8 +66,10 @@ wss.on('connection', (client : ws, request : http.IncomingMessage) => {
     return;
   }
 
-  let localConnection = rpcServer.createServerProcess('Example', langServer[0], langServer.slice(1));
-  let socket : rpc.IWebSocket = toSocket(client);
+  console.log(langServer[0]);
+  console.log(langServer.slice(1));
+  let localConnection = rpcServer.createServerProcess('ExampleTest', langServer[0], langServer.slice(1));
+  let socket: rpc.IWebSocket = toSocket(client);
   let connection = rpcServer.createWebSocketConnection(socket);
   rpcServer.forward(connection, localConnection);
   console.log(`Forwarding new client`);
